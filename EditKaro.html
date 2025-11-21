@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EditKaro | Clean White Theme (Feature Complete)</title>
+    <!-- Load Inter Font and Tailwind CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* --- GLOBAL THEME CLASSES --- */
+        /* Light Theme (Default) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* Very Light Gray Background */
+            color: #1f2937; /* Dark text for contrast */
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        .bg-card { background-color: #ffffff; }
+        .text-default { color: #1f2937; }
+        .bg-default { background-color: #f9fafb; }
+        .bg-secondary { background-color: #ffffff; }
+
+        /* Dark Theme Overrides (Applied via JS) */
+        body.dark-mode {
+            background-color: #0A0A0A;
+            color: #ffffff;
+        }
+        body.dark-mode .bg-card { background-color: #1f2937; }
+        body.dark-mode .text-default { color: #ffffff; }
+        body.dark-mode .text-secondary { color: #d1d5db; }
+        body.dark-mode .bg-default { background-color: #0A0A0A; }
+        body.dark-mode .bg-secondary { background-color: #111827; }
+        body.dark-mode .border-theme { border-color: #374151; }
+        body.dark-mode .input-field { background-color: #1f2937; border-color: #374151; color: #ffffff; }
+
+        /* --- UTILITIES & CUSTOM STYLES --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #e5e7eb; }
+        ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 4px; }
+        .accent-color { color: #3b82f6; }
+        .btn-primary { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-primary:hover { box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5), 0 4px 6px -4px rgba(59, 130, 246, 0.3); transform: translateY(-2px); }
+        .input-focus:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+        /* Before/After Slider */
+        .slider-container { position: relative; width: 100%; padding-top: 66.66%; overflow: hidden; cursor: ew-resize; border-radius: 0.75rem; }
+        .slider-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        #after-image { width: 50%; }
+        .slider-divider { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background-color: white; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); transform: translateX(-50%); pointer-events: none; z-index: 10; }
+        .slider-handle { position: absolute; top: 50%; left: 50%; width: 30px; height: 30px; background-color: white; border-radius: 50%; border: 3px solid #3b82f6; transform: translate(-50%, -50%); pointer-events: none; z-index: 20; }
+        /* Project Tracker Mock-up */
+        #project-tracker-info { position: fixed; top: 100px; right: 20px; z-index: 60; transition: transform 0.3s ease-out; transform: translateX(120%); }
+        #project-tracker-info.active { transform: translateX(0); }
+         /* "Read More" Container Styling */
+        .truncated-text { height: 48px; overflow: hidden; transition: height 0.3s ease-in-out; }
+        .expanded-text { height: auto; }
+    </style>
+</head>
+<body>
+    
+    <!-- TRICK 2: Scroll Progress Bar -->
+    <div id="progress-bar" class="fixed top-0 left-0 h-1 bg-blue-600 z-[150] transition-all duration-75 ease-out" style="width: 0;"></div>
+
+    <!-- Client Project Tracker Mock-up (Feature 5 Info Block) -->
+    <div id="project-tracker-info" class="p-4 bg-blue-600 text-white rounded-lg shadow-2xl border-l-4 border-white hidden">
+        <h4 class="font-bold text-lg mb-1">Project Status Update</h4>
+        <p class="text-sm">Project ID: <span class="font-mono">#4567</span></p>
+        <p class="text-sm">Status: <span class="font-bold">First Draft Ready for Review</span></p>
+        <button onclick="document.getElementById('project-tracker-info').classList.add('hidden')" class="text-xs mt-2 opacity-75 hover:opacity-100 underline">Dismiss</button>
+    </div>
+
+    <!-- Login/Signup Modal -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[200] p-4">
+        <div class="bg-white p-8 rounded-xl max-w-sm w-full text-center shadow-2xl relative text-default">
+            
+            <!-- Close Button -->
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <!-- Tab Switcher -->
+            <div class="flex mb-6 border-b border-gray-200">
+                <button id="login-tab" onclick="switchAuthMode('login')" class="flex-1 py-3 font-bold text-lg border-b-2 transition duration-300 text-blue-600 border-blue-600">Login</button>
+                <button id="signup-tab" onclick="switchAuthMode('signup')" class="flex-1 py-3 font-bold text-lg border-b-2 transition duration-300 text-gray-500 border-transparent hover:border-gray-300">Sign Up</button>
+            </div>
+
+            <!-- Login View -->
+            <div id="login-view" class="auth-view space-y-4">
+                <h3 class="text-2xl font-bold text-gray-900">Welcome Back</h3>
+                
+                <!-- Google Button -->
+                <button class="w-full flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-300 font-semibold text-gray-700">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo-google.png" alt="Google logo" class="w-5 h-5">
+                    <span>Continue with Google</span>
+                </button>
+
+                <div class="flex items-center space-x-2 text-gray-500 text-sm">
+                    <hr class="flex-grow border-gray-300"><span class="font-semibold">OR</span><hr class="flex-grow border-gray-300">
+                </div>
+
+                <input type="email" placeholder="Email" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg input-focus input-field" required>
+                <input type="password" placeholder="Password" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg input-focus input-field" required>
+
+                <button class="w-full p-3 text-lg font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 btn-primary">
+                    Login
+                </button>
+            </div>
+
+            <!-- Signup View -->
+            <div id="signup-view" class="auth-view space-y-4 hidden">
+                <h3 class="text-2xl font-bold text-gray-900">Create Account</h3>
+
+                 <!-- Google Button -->
+                <button class="w-full flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-300 font-semibold text-gray-700">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo-google.png" alt="Google logo" class="w-5 h-5">
+                    <span>Continue with Google</span>
+                </button>
+                
+                <div class="flex items-center space-x-2 text-gray-500 text-sm">
+                    <hr class="flex-grow border-gray-300"><span class="font-semibold">OR</span><hr class="flex-grow border-gray-300">
+                </div>
+
+                <input type="text" placeholder="Full Name" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg input-focus input-field" required>
+                <input type="email" placeholder="Email" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg input-focus input-field" required>
+                <input type="password" placeholder="Password (min 6 characters)" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg input-focus input-field" required>
+                
+                <button class="w-full p-3 text-lg font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 btn-primary">
+                    Sign Up
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newsletter Modal -->
+    <div id="newsletter-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] transition-opacity duration-300 opacity-0">
+        <div class="bg-white p-8 rounded-xl max-w-lg w-11/12 text-center shadow-2xl border-t-8 border-blue-600 relative transform transition-transform duration-500 scale-90 text-default">
+            <button onclick="closeNewsletterModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 transition duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-3xl font-bold text-gray-900 mb-2 accent-color">Unlock Your Video Potential!</h3>
+            <p class="text-gray-600 mb-6">Subscribe to our newsletter and get a **Free Video Editing Checklist PDF** immediately.</p>
+            <form class="space-y-4">
+                <input type="email" placeholder="Your Email Address" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg input-focus input-field" required>
+                <button type="submit" class="w-full px-4 py-3 text-lg font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 btn-primary">
+                    Get Free Checklist
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Navigation Bar (Header) -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg transition duration-300" id="main-header">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#home" class="text-3xl font-extrabold accent-color hover:opacity-90 transition duration-300">Edit<span class="text-gray-900 text-default" id="logo-span">Karo</span></a>
+
+            <!-- Desktop Navigation Links -->
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#home" class="nav-link text-gray-700 text-default font-medium hover:text-blue-600 transition duration-300">Home</a>
+                <a href="#portfolio" class="nav-link text-gray-700 text-default font-medium hover:text-blue-600 transition duration-300">Portfolio</a>
+                <a href="#services" class="nav-link text-gray-700 text-default font-medium hover:text-blue-600 transition duration-300">Services</a>
+                <a href="#about" class="nav-link text-gray-700 text-default font-medium hover:text-blue-600 transition duration-300">About</a>
+                <a href="#contact" class="nav-link text-gray-700 text-default font-medium hover:text-blue-600 transition duration-300">Contact</a>
+                <a href="#" id="client-login-btn-desktop" class="nav-link text-gray-700 text-default font-medium hover:text-blue-600 transition duration-300">Project Status</a>
+                
+                <!-- New Theme Toggle Button -->
+                <button onclick="toggleTheme()" class="px-3 py-1.5 text-sm font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-300" id="theme-toggle-btn">
+                    Dark Mode
+                </button>
+
+                <!-- New Login/Signup Button -->
+                <button onclick="openAuthModal()" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 btn-primary">
+                    Login/Signup
+                </button>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-gray-800 text-default focus:outline-none p-2 rounded-lg hover:bg-gray-100 transition duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </nav>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white px-4 pb-4 border-t border-gray-200 bg-secondary">
+            <a href="#home" class="block py-3 text-gray-700 text-default hover:text-blue-600 transition duration-300 font-semibold" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Home</a>
+            <a href="#portfolio" class="block py-3 text-gray-700 text-default hover:text-blue-600 transition duration-300 font-semibold" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Portfolio</a>
+            <a href="#services" class="block py-3 text-gray-700 text-default hover:text-blue-600 transition duration-300 font-semibold" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Services</a>
+            <a href="#about" class="block py-3 text-gray-700 text-default hover:text-blue-600 transition duration-300 font-semibold" onclick="document.getElementById('mobile-menu').classList.add('hidden')">About</a>
+            <a href="#contact" class="block py-3 text-gray-700 text-default hover:text-blue-600 transition duration-300 font-semibold" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Contact</a>
+            <a href="#" id="client-login-btn-mobile" class="block py-3 text-gray-700 text-default hover:text-blue-600 transition duration-300 font-semibold" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Project Status</a>
+            
+            <!-- New Theme Toggle Button (Mobile) -->
+            <button onclick="toggleTheme()" class="w-full mt-3 px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-300" id="theme-toggle-btn-mobile">
+                Dark Mode
+            </button>
+            
+            <button onclick="openAuthModal()" class="w-full mt-3 px-4 py-3 text-lg font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 btn-primary">
+                Login/Signup
+            </button>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <!-- HOME SECTION (Hero) -->
+        <section id="home" class="container mx-auto px-4 py-24 sm:py-32 lg:py-40 text-center relative overflow-hidden bg-white bg-secondary">
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 text-gray-900 text-default">
+                Transform Your Videos with <span class="accent-color">EditKaro.in</span>
+            </h1>
+            <p class="text-lg sm:text-xl text-gray-600 text-secondary mb-10 max-w-4xl mx-auto">
+                Professional video editing services that bring your vision to life. From corporate videos to social media content, we handle it all with expertise, delivering **cinematic quality and quick turnaround**.
+            </p>
+            <div class="space-y-4 sm:space-y-0 sm:space-x-6">
+                <!-- Primary Button -->
+                <a href="#portfolio" class="inline-block px-10 py-4 text-xl font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 btn-primary">
+                    View Our Work
+                </a>
+                <!-- Secondary Button with Hover Effect -->
+                <a href="#contact" class="inline-block px-10 py-4 text-xl font-bold text-blue-600 border-2 border-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition duration-300 hover:shadow-lg">
+                    Get Started
+                </a>
+            </div>
+        </section>
+
+        <!-- PORTFOLIO SECTION -->
+        <section id="portfolio" class="py-16 md:py-24 bg-gray-100 bg-default">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-bold text-center mb-4 text-gray-900 text-default">Our Video Portfolio</h2>
+                <p class="text-center text-gray-600 text-secondary mb-12">Explore our collection of high-impact projects across specialized categories.</p>
+
+                <!-- Filter Tabs -->
+                <div class="flex flex-wrap justify-center space-x-2 sm:space-x-4 mb-10">
+                    <button class="portfolio-filter px-5 py-2 text-sm sm:text-base rounded-full font-medium transition duration-300 bg-blue-600 text-white shadow-md" data-filter="all">All Projects</button>
+                    <button class="portfolio-filter px-5 py-2 text-sm sm:text-base rounded-full font-medium transition duration-300 bg-gray-200 text-gray-700 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-300/60 hover:-translate-y-0.5" data-filter="short-form">Short-Form</button>
+                    <button class="portfolio-filter px-5 py-2 text-sm sm:text-base rounded-full font-medium transition duration-300 bg-gray-200 text-gray-700 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-300/60 hover:-translate-y-0.5" data-filter="gaming">Gaming</button>
+                    <button class="portfolio-filter px-5 py-2 text-sm sm:text-base rounded-full font-medium transition duration-300 bg-gray-200 text-gray-700 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-300/60 hover:-translate-y-0.5" data-filter="ecommerce">E-Commerce</button>
+                    <button class="portfolio-filter px-5 py-2 text-sm sm:text-base rounded-full font-medium transition duration-300 bg-gray-200 text-gray-700 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-300/60 hover:-translate-y-0.5" data-filter="documentary">Documentary</button>
+                </div>
+
+                <!-- Portfolio Grid -->
+                <div id="portfolio-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Dynamic Before-and-After Slider (Replaced Project 1) -->
+                    <div class="portfolio-item bg-card rounded-xl shadow-xl overflow-hidden group transition duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-400/70 hover:-translate-y-0.5 border border-gray-200 hover:border-blue-300 border-theme" data-category="short-form">
+                        <div id="slider-1-container" class="slider-container relative" onmouseleave="isDragging = false;">
+                            <!-- Before Image (Base) -->
+                            <img src="https://placehold.co/600x400/808080/ffffff?text=RAW+FOOTAGE+(Before)" alt="Before Image" class="slider-img">
+                            
+                            <!-- After Image (Adjustable Width) -->
+                            <img id="after-image" src="https://placehold.co/600x400/2563eb/ffffff?text=FINAL+EDIT+(After)" alt="After Image" class="slider-img" style="width: 50%;">
+
+                            <!-- Divider and Handle -->
+                            <div id="slider-divider" class="slider-divider" style="left: 50%;"></div>
+                            <div id="slider-handle" class="slider-handle" style="left: 50%;"></div>
+                        </div>
+
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-2 text-blue-700">Before & After Showcase</h3>
+                            <p class="text-gray-600 text-secondary mb-4 text-sm">Drag the slider to see the difference professional color grading and cleanup makes!</p>
+                            <span class="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Color Grading</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 2 -->
+                    <div class="portfolio-item bg-card rounded-xl shadow-xl overflow-hidden group transition duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-red-400/70 hover:-translate-y-0.5 border border-gray-200 hover:border-red-300 border-theme" data-category="gaming">
+                        <img src="https://placehold.co/600x400/dc2626/ffffff?text=Gaming+Highlights" alt="Gaming Highlights" class="w-full h-48 object-cover group-hover:opacity-90 transition duration-500">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-2 text-red-700">Gaming Highlights</h3>
+                            <p class="text-gray-600 text-secondary mb-4 text-sm">Action-packed gaming video showcasing epic moments and skillful gameplay for social media.</p>
+                            <span class="inline-block bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Gaming</span>
+                        </div>
+                    </div>
+                    <!-- Project 3 -->
+                    <div class="portfolio-item bg-card rounded-xl shadow-xl overflow-hidden group transition duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-green-400/70 hover:-translate-y-0.5 border border-gray-200 hover:border-green-300 border-theme" data-category="documentary">
+                        <img src="https://placehold.co/600x400/059669/ffffff?text=Urban+Stories" alt="Urban Stories" class="w-full h-48 object-cover group-hover:opacity-90 transition duration-500">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-2 text-green-700">Urban Stories</h3>
+                            <p class="text-gray-600 text-secondary mb-4 text-sm">Documentary-style video capturing the essence of urban life and cultural narratives.</p>
+                            <span class="inline-block bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Documentary</span>
+                        </div>
+                    </div>
+                    <!-- Project 4 -->
+                    <div class="portfolio-item bg-card rounded-xl shadow-xl overflow-hidden group transition duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-400/70 hover:-translate-y-0.5 border border-gray-200 hover:border-purple-300 border-theme" data-category="ecommerce">
+                        <img src="https://placehold.co/600x400/9333ea/ffffff?text=Fashion+Collection" alt="Fashion Collection" class="w-full h-48 object-cover group-hover:opacity-90 transition duration-500">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-2 text-purple-700">Fashion Collection</h3>
+                            <p class="text-gray-600 text-secondary mb-4 text-sm">E-commerce fashion showcase with elegant transitions and product-focused shots.</p>
+                            <span class="inline-block bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">E-commerce</span>
+                        </div>
+                    </div>
+                    <!-- Project 5 -->
+                    <div class="portfolio-item bg-card rounded-xl shadow-xl overflow-hidden group transition duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-yellow-400/70 hover:-translate-y-0.5 border border-gray-200 hover:border-yellow-300 border-theme" data-category="long-form">
+                        <img src="https://placehold.co/600x400/ca8a04/ffffff?text=Brand+Story" alt="Brand Story" class="w-full h-48 object-cover group-hover:opacity-90 transition duration-500">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-2 text-yellow-700">Brand Story</h3>
+                            <p class="text-gray-600 text-secondary mb-4 text-sm">Long-form video telling a brand's story with cinematic visuals and compelling narrative structure.</p>
+                            <span class="inline-block bg-yellow-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Long-Form</span>
+                        </div>
+                    </div>
+                    <!-- Project 6 -->
+                    <div class="portfolio-item bg-card rounded-xl shadow-xl overflow-hidden group transition duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-orange-400/70 hover:-translate-y-0.5 border border-gray-200 hover:border-orange-300 border-theme" data-category="short-form">
+                        <img src="https://placehold.co/600x400/f97316/ffffff?text=Social+Ad+Reel" alt="Social Ad Reel" class="w-full h-48 object-cover group-hover:opacity-90 transition duration-500">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-2 text-orange-700">Social Ad Reel</h3>
+                            <p class="text-gray-600 text-secondary mb-4 text-sm">High-impact short advertisement designed for maximum conversion on social platforms.</p>
+                            <span class="inline-block bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Short-Form</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-16">
+                    <button class="px-10 py-4 text-lg font-semibold text-gray-700 bg-gray-200 rounded-xl hover:bg-blue-600 hover:text-white transition duration-300 shadow-lg hover:shadow-blue-300/50">
+                        Load More Projects
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SERVICES SECTION -->
+        <section id="services" class="py-16 md:py-24 bg-white bg-secondary">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-bold text-center mb-4 text-gray-900 text-default">Our Core Services</h2>
+                <p class="text-center text-gray-600 text-secondary mb-12 max-w-2xl mx-auto">
+                    We offer specialized video editing and strategic content marketing to maximize your brand's reach and impact.
+                </p>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center mb-16">
+                    <div class="p-6 bg-gray-50 rounded-xl shadow-xl border border-gray-200 border-theme">
+                        <p class="text-5xl font-extrabold accent-color mb-1">100+</p>
+                        <p class="text-gray-700 text-default uppercase tracking-widest text-sm">Happy Clients</p>
+                    </div>
+                    <div class="p-6 bg-gray-50 rounded-xl shadow-xl border border-gray-200 border-theme">
+                        <p class="text-5xl font-extrabold accent-color mb-1">500+</p>
+                        <p class="text-gray-700 text-default uppercase tracking-widest text-sm">Projects Completed</p>
+                    </div>
+                    <div class="p-6 bg-gray-50 rounded-xl shadow-xl border border-gray-200 border-theme">
+                        <p class="text-5xl font-extrabold accent-color mb-1">5+</p>
+                        <p class="text-gray-700 text-default uppercase tracking-widest text-sm">Years Experience</p>
+                    </div>
+                    <div class="p-6 bg-gray-50 rounded-xl shadow-xl border border-gray-200 border-theme">
+                        <p class="text-5xl font-extrabold accent-color mb-1">9</p>
+                        <p class="text-gray-700 text-default uppercase tracking-widest text-sm">Video Categories</p>
+                    </div>
+                </div>
+
+                <!-- Services Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Service Card 1 (Read More Demo) -->
+                    <div class="p-8 bg-card rounded-xl shadow-xl border-t-4 border-blue-600 hover:scale-[1.01] transition duration-300 hover:shadow-blue-400/70 hover:ring-2 hover:ring-blue-600/50 border-theme">
+                        <h3 class="text-2xl font-bold mb-3 text-blue-700">Video Editing</h3>
+                        <!-- Truncated Text Container -->
+                        <div id="service-text-1" class="truncated-text">
+                             <p class="text-gray-600 text-secondary">Professional editing services including precise cuts, seamless transitions, advanced visual effects, and customized motion graphics to transform raw footage into highly engaging and polished content. We handle everything from basic assembly to complex narrative structuring, ensuring your story is told effectively.</p>
+                        </div>
+                        <button id="read-more-btn-1" onclick="toggleReadMore(1)" class="text-sm font-semibold text-blue-600 mt-2 hover:text-blue-800 transition duration-300">
+                            Read More
+                        </button>
+                    </div>
+                    <!-- Service Card 2 -->
+                    <div class="p-8 bg-card rounded-xl shadow-xl border-t-4 border-yellow-600 hover:scale-[1.01] transition duration-300 hover:shadow-yellow-400/70 hover:ring-2 hover:ring-yellow-600/50 border-theme">
+                        <h3 class="text-2xl font-bold mb-3 text-yellow-700">Color Grading</h3>
+                        <p class="text-gray-600 text-secondary">Enhance the visual appeal of your videos with professional color grading that sets the mood, corrects inconsistencies, and creates a consistent, cinematic look across all your footage.</p>
+                    </div>
+                    <!-- Service Card 3 -->
+                    <div class="p-8 bg-card rounded-xl shadow-xl border-t-4 border-green-600 hover:scale-[1.01] transition duration-300 hover:shadow-green-400/70 hover:ring-2 hover:ring-green-600/50 border-theme">
+                        <h3 class="text-2xl font-bold mb-3 text-green-700">Audio Enhancement</h3>
+                        <p class="text-gray-600 text-secondary">Improve your video's audio quality with background music licensing, sound effects layering, precise noise reduction, and professional audio mixing to deliver crystal-clear sound.</p>
+                    </div>
+                    <!-- Service Card 4 -->
+                    <div class="p-8 bg-card rounded-xl shadow-xl border-t-4 border-purple-600 hover:scale-[1.01] transition duration-300 hover:shadow-purple-400/70 hover:ring-2 hover:ring-purple-600/50 border-theme">
+                        <h3 class="text-2xl font-bold mb-3 text-purple-700">Social Media Marketing</h3>
+                        <p class="text-gray-600 text-secondary">Strategic social media content creation and optimization to increase engagement, drive traffic, and reach your target audience across platforms like TikTok, YouTube, and Instagram.</p>
+                    </div>
+                    <!-- Service Card 5 -->
+                    <div class="p-8 bg-card rounded-xl shadow-xl border-t-4 border-red-600 hover:scale-[1.01] transition duration-300 hover:shadow-red-400/70 hover:ring-2 hover:ring-red-600/50 border-theme">
+                        <h3 class="text-2xl font-bold mb-3 text-red-700">Motion Graphics</h3>
+                        <p class="text-gray-600 text-secondary">Eye-catching motion graphics, kinetic typography, and custom animations to make your videos stand out and convey information effectively, perfect for intros and explainer videos.</p>
+                    </div>
+                    <!-- Service Card 6 -->
+                    <div class="p-8 bg-card rounded-xl shadow-xl border-t-4 border-orange-600 hover:scale-[1.01] transition duration-300 hover:shadow-orange-400/70 hover:ring-2 hover:ring-orange-600/50 border-theme">
+                        <h3 class="text-2xl font-bold mb-3 text-orange-700">Content Strategy</h3>
+                        <p class="text-gray-600 text-secondary">Comprehensive content planning, keyword research, and distribution planning to ensure your videos meet your marketing goals and resonate with the audience.</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Price Quote Calculator -->
+                <div class="mt-20 p-8 bg-gray-50 rounded-2xl shadow-xl border border-gray-200 max-w-4xl mx-auto bg-default border-theme">
+                    <h3 class="text-3xl font-bold text-gray-900 text-default mb-6 text-center">Instant Quote Calculator</h3>
+                    <p class="text-center text-gray-600 text-secondary mb-8">Get an immediate estimated cost for your video editing project.</p>
+                    
+                    <form id="quote-calculator" class="grid md:grid-cols-3 gap-6">
+                        <!-- Video Length -->
+                        <div>
+                            <label for="video-length" class="block font-semibold mb-2 text-gray-700 text-default">1. Video Length</label>
+                            <select id="video-length" class="w-full p-3 bg-white border border-gray-300 rounded-lg input-focus input-field" onchange="calculateQuote(); checkCustomOption('length')">
+                                <option value="1"> &lt; 1 Minute</option>
+                                <option value="2" selected>1 - 5 Minutes</option>
+                                <option value="4"> &gt; 5 Minutes</option>
+                                <option value="99"> Other (Custom)</option>
+                            </select>
+                            <input type="text" id="custom-length" placeholder="Enter custom length" class="hidden w-full p-3 bg-white border border-gray-300 rounded-lg input-focus input-field mt-3">
+                        </div>
+                        
+                        <!-- Service Tier -->
+                        <div>
+                            <label for="service-tier" class="block font-semibold mb-2 text-gray-700 text-default">2. Service Tier</label>
+                            <select id="service-tier" class="w-full p-3 bg-white border border-gray-300 rounded-lg input-focus input-field" onchange="calculateQuote(); checkCustomOption('tier')">
+                                <option value="1">Basic (Cuts, Audio)</option>
+                                <option value="1.5">Standard (Color, Motion)</option>
+                                <option value="2">Premium (Cinematic, VFX)</option>
+                                <option value="99"> Other (Custom)</option>
+                            </select>
+                            <input type="text" id="custom-tier" placeholder="Enter custom tier details" class="hidden w-full p-3 bg-white border border-gray-300 rounded-lg input-focus input-field mt-3">
+                        </div>
+                        
+                        <!-- Turnaround -->
+                        <div>
+                            <label for="turnaround" class="block font-semibold mb-2 text-gray-700 text-default">3. Turnaround</label>
+                            <select id="turnaround" class="w-full p-3 bg-white border border-gray-300 rounded-lg input-focus input-field" onchange="calculateQuote(); checkCustomOption('turnaround')">
+                                <option value="1">Standard (5-7 days)</option>
+                                <option value="1.3">Rush (48 hours)</option>
+                                <option value="99"> Other (Custom)</option>
+                            </select>
+                            <input type="text" id="custom-turnaround" placeholder="Enter custom time" class="hidden w-full p-3 bg-white border border-gray-300 rounded-lg input-focus input-field mt-3">
+                        </div>
+                    </form>
+                    
+                    <!-- Result -->
+                    <div class="mt-8 pt-6 border-t border-gray-300 border-theme text-center">
+                        <p class="text-xl font-semibold text-gray-700 text-default">Estimated Cost (USD):</p>
+                        <p id="quote-result" class="text-5xl font-extrabold accent-color mt-2">$350</p>
+                        <p id="custom-quote-prompt" class="text-red-500 text-sm mt-2 hidden">
+                            **Custom input selected.** Please contact us for a final quote based on your requirements.
+                        </p>
+                        <a href="#contact" class="inline-block mt-6 px-8 py-3 text-lg font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 btn-primary">
+                            Request Exact Quote
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section id="about" class="py-16 md:py-24 bg-gray-100 bg-default">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-bold text-center mb-12 text-gray-900 text-default">About EditKaro</h2>
+
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <!-- About Text -->
+                    <div>
+                        <p class="text-gray-600 text-secondary mb-6 text-lg">
+                            EditKaro is a premier video editing and social media marketing agency based in India. We specialize in creating engaging, high-quality video content for brands, individuals, and businesses across various industries.
+                        </p>
+                        <p class="text-gray-600 text-secondary mb-8 text-lg border-l-4 border-blue-600 pl-4 py-2 bg-white rounded-lg shadow-sm bg-secondary border-theme">
+                            Our team of skilled editors, motion graphics artists, and social media specialists work together to deliver content that not only looks professional but also drives **engagement and results**.
+                        </p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Checkmark Icons -->
+                            <div class="flex items-center space-x-2 text-gray-700 text-default font-semibold">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Professional Quality</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-gray-700 text-default font-semibold">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Quick Turnaround</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-gray-700 text-default font-semibold">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Creative Solutions</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-gray-700 text-default font-semibold">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Client Satisfaction</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image Placeholder -->
+                    <div class="hidden lg:block relative p-4 bg-white rounded-xl shadow-2xl border border-gray-200 bg-secondary border-theme">
+                        <img src="https://placehold.co/600x400/2563eb/ffffff?text=EditKaro+Team+Working" alt="EditKaro team working" class="rounded-lg shadow-xl opacity-95">
+                        <div class="absolute inset-0 bg-blue-100/10 rounded-xl pointer-events-none"></div>
+                    </div>
+                </div>
+
+                <!-- FEATURE 3: Skills & Software Showcase -->
+                <div class="mt-20 p-6 bg-white rounded-xl shadow-lg border border-gray-200 bg-secondary border-theme">
+                    <h3 class="text-2xl font-bold text-center text-gray-900 text-default mb-6">Tools of the Trade</h3>
+                    <div class="flex flex-wrap justify-center items-center space-x-8 md:space-x-12 opacity-80">
+                        <!-- Premiere Pro -->
+                        <div class="text-center">
+                            <img src="https://placehold.co/60x60/8080ff/ffffff?text=PR" alt="Premiere Pro" class="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-lg shadow-md">
+                            <p class="text-xs text-gray-600 text-secondary mt-2">Premiere Pro</p>
+                        </div>
+                        <!-- After Effects -->
+                        <div class="text-center">
+                            <img src="https://placehold.co/60x60/ff9933/ffffff?text=AE" alt="After Effects" class="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-lg shadow-md">
+                            <p class="text-xs text-gray-600 text-secondary mt-2">After Effects</p>
+                        </div>
+                        <!-- DaVinci Resolve -->
+                        <div class="text-center">
+                            <img src="https://placehold.co/60x60/000000/ffcc00?text=DR" alt="DaVinci Resolve" class="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-lg shadow-md">
+                            <p class="text-xs text-gray-600 text-secondary mt-2">DaVinci Resolve</p>
+                        </div>
+                        <!-- Photoshop -->
+                        <div class="text-center">
+                            <img src="https://placehold.co/60x60/33ccff/ffffff?text=PS" alt="Photoshop" class="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-lg shadow-md">
+                            <p class="text-xs text-gray-600 text-secondary mt-2">Photoshop</p>
+                        </div>
+                        <!-- Illustrator -->
+                        <div class="text-center">
+                            <img src="https://placehold.co/60x60/ff3333/ffffff?text=AI" alt="Illustrator" class="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-lg shadow-md">
+                            <p class="text-xs text-gray-600 text-secondary mt-2">Illustrator</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonials -->
+                <h3 class="text-3xl font-bold text-center mt-20 mb-8 text-gray-900 text-default">Client Testimonials</h3>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-card p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-2xl hover:shadow-blue-400/70 transition duration-300 border-theme">
+                        <svg class="w-8 h-8 text-blue-500 mb-3" fill="currentColor" viewBox="0 0 24 24"><path d="M13 14.725c0-5.141 3.892-10.519 10-11.725l1 2.216c-3.414.665-6 3.011-6 6.509h6v3h-8v3h-2v-3zm-10 0c0-5.141 3.892-10.519 10-11.725l1 2.216c-3.414.665-6 3.011-6 6.509h6v3h-8v3h-2v-3z"/></svg>
+                        <p class="italic text-gray-700 text-default mb-4">"EditKaro transformed our product videos completely. The quality of editing and attention to detail was outstanding, and the team was incredibly responsive to feedback."</p>
+                        <p class="font-bold text-blue-600">- Rohit Sharma</p>
+                        <p class="text-sm text-gray-500 text-secondary">E-Commerce Business Owner</p>
+                    </div>
+                    <div class="bg-card p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-2xl hover:shadow-blue-400/70 transition duration-300 border-theme">
+                        <svg class="w-8 h-8 text-blue-500 mb-3" fill="currentColor" viewBox="0 0 24 24"><path d="M13 14.725c0-5.141 3.892-10.519 10-11.725l1 2.216c-3.414.665-6 3.011-6 6.509h6v3h-8v3h-2v-3zm-10 0c0-5.141 3.892-10.519 10-11.725l1 2.216c-3.414.665-6 3.011-6 6.509h6v3h-8v3h-2v-3z"/></svg>
+                        <p class="italic text-gray-700 text-default mb-4">"The team at EditKaro has been instrumental in growing our YouTube channel. Their editing skills and creative input have helped our content stand out in a crowded space."</p>
+                        <p class="font-bold text-blue-600">- Priya Patel</p>
+                        <p class="text-sm text-gray-500 text-secondary">Content Creator</p>
+                    </div>
+                    <div class="bg-card p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-2xl hover:shadow-blue-400/70 transition duration-300 border-theme">
+                        <svg class="w-8 h-8 text-blue-500 mb-3" fill="currentColor" viewBox="0 0 24 24"><path d="M13 14.725c0-5.141 3.892-10.519 10-11.725l1 2.216c-3.414.665-6 3.011-6 6.509h6v3h-8v3h-2v-3zm-10 0c0-5.141 3.892-10.519 10-11.725l1 2.216c-3.414.665-6 3.011-6 6.509h6v3h-8v3h-2v-3z"/></svg>
+                        <p class="italic text-gray-700 text-default mb-4">"We hired EditKaro for our corporate documentaries, and the results exceeded our expectations. Their professional approach and quick turnaround time made the process smooth."</p>
+                        <p class="font-bold text-blue-600">- Vikram Singh</p>
+                        <p class="text-sm text-gray-500 text-secondary">Marketing Director</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact" class="py-16 md:py-24 bg-white bg-secondary">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-bold text-center mb-4 text-gray-900 text-default">Start Your Project</h2>
+                <p class="text-center text-gray-600 text-secondary mb-12 max-w-2xl mx-auto">
+                    Ready to discuss your vision? Fill out the form below, and our team will connect with you within **24 business hours**.
+                </p>
+
+                <div class="grid lg:grid-cols-3 gap-12 bg-gray-100 p-8 md:p-12 rounded-2xl shadow-xl border border-gray-200 bg-default border-theme">
+                    <!-- Contact Info -->
+                    <div class="lg:col-span-1 space-y-8">
+                        <h3 class="text-2xl font-bold text-gray-900 text-default mb-4 border-b border-blue-600 pb-2">Connect Directly</h3>
+                        <div class="flex items-center space-x-4">
+                            <svg class="w-8 h-8 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <div>
+                                <h4 class="font-semibold accent-color">Email Us</h4>
+                                <p class="text-gray-700 text-default text-sm">info@editkaro.in</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <svg class="w-8 h-8 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                            <div>
+                                <h4 class="font-semibold accent-color">Call Us</h4>
+                                <p class="text-gray-700 text-default text-sm">+91 98765 43210</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <svg class="w-8 h-8 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.899c-.78.78-2.04.78-2.82 0L6.343 16.657a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <div>
+                                <h4 class="font-semibold accent-color">Visit Us</h4>
+                                <p class="text-gray-700 text-default text-sm">123 Creative Hub, Mumbai, India</p>
+                            </div>
+                        </div>
+                        <div class="pt-4">
+                            <h4 class="text-xl font-semibold accent-color mb-2">Follow Us</h4>
+                            <div class="flex space-x-4">
+                                <!-- Placeholder Icons for Social Media -->
+                                <a href="#" class="text-gray-500 hover:text-blue-600 transition duration-300 p-2 bg-white rounded-full shadow-md bg-secondary border-theme">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.336-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
+                                </a>
+                                <a href="#" class="text-gray-500 hover:text-blue-600 transition duration-300 p-2 bg-white rounded-full shadow-md bg-secondary border-theme">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.795-1.574 2.164-2.722-.951.555-2.005.959-3.127 1.184-.943-1.003-2.288-1.624-3.79-1.624-3.692 0-6.68 3.003-6.68 6.71s2.988 6.71 6.68 6.71c.846 0 1.666-.17 2.435-.472 1.054 1.674 2.827 2.864 4.88 3.167-.348.044-.698.066-1.054.066-1.536 0-3.004-.399-4.32-.988-.707.98-1.61 1.782-2.658 2.378 2.053.197 4.098-.592 5.564-2.146.467-.148.92-.308 1.36-.48.033.43.05.86.05 1.298 0 .804-.078 1.583-.234 2.338-.306 1.48-.97 2.805-1.92 3.967z"/></svg>
+                                </a>
+                                <a href="#" class="text-gray-500 hover:text-blue-600 transition duration-300 p-2 bg-white rounded-full shadow-md bg-secondary border-theme">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12s5.374 12 12 12 12-5.373 12-12-5.374-12-12-12zm-2 16h-3v-9h3v9zm-1.5-10.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm10.5 10.268h-3v-5.604c0-3.368-4-3.336-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="lg:col-span-2">
+                        <form id="contact-form" class="space-y-4">
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <input type="text" id="first-name" placeholder="First Name" class="w-full p-4 bg-white border border-gray-300 rounded-xl input-focus text-gray-900 transition duration-300 input-field" required>
+                                <input type="text" id="last-name" placeholder="Last Name" class="w-full p-4 bg-white border border-gray-300 rounded-xl input-focus text-gray-900 transition duration-300 input-field" required>
+                            </div>
+                            <input type="tel" id="contact-number" placeholder="Contact Number" class="w-full p-4 bg-white border border-gray-300 rounded-xl input-focus text-gray-900 transition duration-300 input-field" required>
+                            <input type="email" id="email" placeholder="Email" class="w-full p-4 bg-white border border-gray-300 rounded-xl input-focus text-gray-900 transition duration-300 input-field" required>
+                            <input type="text" id="subject" placeholder="Subject" class="w-full p-4 bg-white border border-gray-300 rounded-xl input-focus text-gray-900 transition duration-300 input-field" required>
+                            <textarea id="message" rows="4" placeholder="Message" class="w-full p-4 bg-white border border-gray-300 rounded-xl input-focus text-gray-900 transition duration-300 input-field" required></textarea>
+                            <select id="service-interested" class="w-full p-4 bg-white border border-gray-300 rounded-xl input-focus text-gray-600 appearance-none transition duration-300 input-field" required>
+                                <option value="" disabled selected>Service Interested In</option>
+                                <option value="Video Editing" class="text-gray-900">Video Editing</option>
+                                <option value="Color Grading" class="text-gray-900">Color Grading</option>
+                                <option value="Motion Graphics" class="text-gray-900">Motion Graphics</option>
+                                <option value="Social Media Marketing" class="text-gray-900">Social Media Marketing</option>
+                                <option value="Content Strategy" class="text-gray-900">Content Strategy</option>
+                                <option value="Other" class="text-gray-900">Other</option>
+                            </select>
+                            <!-- Submit Button -->
+                            <button type="submit" class="w-full px-4 py-4 text-xl font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 btn-primary">
+                                Send Message
+                            </button>
+                        </form>
+
+                        <!-- Success Message Modal -->
+                        <div id="success-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[100]">
+                            <div class="bg-white p-10 rounded-xl max-w-sm w-full text-center shadow-blue-300 shadow-2xl border border-blue-600/50 text-gray-900 bg-secondary text-default">
+                                <svg class="w-16 h-16 text-green-500 mx-auto mb-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <h3 class="text-2xl font-bold mb-2 text-green-600">Message Sent!</h3>
+                                <p class="text-gray-600 text-secondary mb-6">Thank you for reaching out. We'll review your project details and get back to you shortly.</p>
+                                <button onclick="closeSuccessModal()" class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 mt-16 pt-12 pb-8 text-gray-700 bg-default border-theme text-default">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <!-- Brand Info -->
+                <div>
+                    <a href="#home" class="text-2xl font-extrabold accent-color">Edit<span class="text-gray-900 text-default">Karo</span></a>
+                    <p class="text-gray-600 text-secondary text-sm mt-3 max-w-xs">Professional video editing and social media marketing agency helping brands create engaging content.</p>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-xl font-bold mb-4 text-gray-900 text-default border-b border-gray-300 pb-1 border-theme">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#home" class="text-gray-600 text-secondary hover:text-blue-600 transition duration-300">Home</a></li>
+                        <li><a href="#portfolio" class="text-gray-600 text-secondary hover:text-blue-600 transition duration-300">Portfolio</a></li>
+                        <li><a href="#services" class="text-gray-600 text-secondary hover:text-blue-600 transition duration-300">Services</a></li>
+                        <li><a href="#about" class="text-gray-600 text-secondary hover:text-blue-600 transition duration-300">About Us</a></li>
+                        <li><a href="#contact" class="text-gray-600 text-secondary hover:text-blue-600 transition duration-300">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Services List -->
+                <div>
+                    <h4 class="text-xl font-bold mb-4 text-gray-900 text-default border-b border-gray-300 pb-1 border-theme">Services</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><span class="text-gray-600 text-secondary hover:text-blue-600 transition duration-300">Video Editing</span></li>
+                        <li><span class="text-gray-600 text-secondary hover:text-blue-600 transition duration-300">Color Grading</span></li>
+                        <li><span class="text-gray-600 text-secondary hover:text-blue-600 transition duration-300">Motion Graphics</span></li>
+                        <li><span class="text-gray-600 text-secondary hover:text-blue-600 transition duration-300">Social Media Marketing</span></li>
+                        <li><span class="text-gray-600 text-secondary hover:text-blue-600 transition duration-300">Content Strategy</span></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-xl font-bold mb-4 text-gray-900 text-default border-b border-gray-300 pb-1 border-theme">Contact</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><span class="text-gray-600 text-secondary">info@editkaro.in</span></li>
+                        <li><span class="text-gray-600 text-secondary">+91 98765 43210</span></li>
+                        <li><span class="text-gray-600 text-secondary">Mumbai, India</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-12 pt-6 border-t border-gray-300 border-theme text-center text-sm text-gray-500 text-secondary">
+                <p>&copy; 2025 EditKaro. All rights reserved. | <a href="#" class="hover:text-blue-600">Privacy Policy</a> | <a href="#" class="hover:text-blue-600">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Interactivity -->
+    <script>
+        // --- THEME SWITCHER LOGIC ---
+        function toggleTheme() {
+            const body = document.body;
+            const isDarkMode = body.classList.toggle('dark-mode');
+            const themeBtn = document.getElementById('theme-toggle-btn');
+            const themeBtnMobile = document.getElementById('theme-toggle-btn-mobile');
+            
+            // Update button text
+            const btnText = isDarkMode ? 'Light Mode' : 'Dark Mode';
+            themeBtn.textContent = btnText;
+            themeBtnMobile.textContent = btnText;
+
+            // Update button color classes
+            const toggleButtons = [themeBtn, themeBtnMobile];
+            toggleButtons.forEach(btn => {
+                if (isDarkMode) {
+                    btn.classList.remove('text-gray-700', 'bg-gray-200', 'hover:bg-gray-300');
+                    btn.classList.add('text-white', 'bg-gray-700', 'hover:bg-gray-600');
+                } else {
+                    btn.classList.remove('text-white', 'bg-gray-700', 'hover:bg-gray-600');
+                    btn.classList.add('text-gray-700', 'bg-gray-200', 'hover:bg-gray-300');
+                }
+            });
+
+            // Update header and mobile menu background/border
+            const header = document.getElementById('main-header');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            header.classList.toggle('bg-white/95');
+            header.classList.toggle('border-gray-200');
+            header.classList.toggle('bg-gray-900/95');
+            header.classList.toggle('border-gray-800');
+            
+            mobileMenu.classList.toggle('bg-white');
+            mobileMenu.classList.toggle('border-gray-200');
+            mobileMenu.classList.toggle('bg-gray-900');
+            mobileMenu.classList.toggle('border-gray-800');
+
+            // Toggle logo color
+            document.getElementById('logo-span').classList.toggle('text-gray-900');
+        }
+
+
+        // --- AUTH MODAL LOGIC (Existing) ---
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            switchAuthMode('login'); 
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function switchAuthMode(mode) {
+            const loginView = document.getElementById('login-view');
+            const signupView = document.getElementById('signup-view');
+            const loginTab = document.getElementById('login-tab');
+            const signupTab = document.getElementById('signup-tab');
+
+            if (mode === 'login') {
+                loginView.classList.remove('hidden');
+                signupView.classList.add('hidden');
+                loginTab.classList.add('text-blue-600', 'border-blue-600');
+                loginTab.classList.remove('text-gray-500', 'border-transparent', 'hover:border-gray-300');
+                signupTab.classList.remove('text-blue-600', 'border-blue-600');
+                signupTab.classList.add('text-gray-500', 'border-transparent', 'hover:border-gray-300');
+            } else if (mode === 'signup') {
+                loginView.classList.add('hidden');
+                signupView.classList.remove('hidden');
+                signupTab.classList.add('text-blue-600', 'border-blue-600');
+                signupTab.classList.remove('text-gray-500', 'border-transparent', 'hover:border-gray-300');
+                loginTab.classList.remove('text-blue-600', 'border-blue-600');
+                loginTab.classList.add('text-gray-500', 'border-transparent', 'hover:border-gray-300');
+            }
+        }
+
+        // --- CUSTOM OPTION LOGIC (New/Updated) ---
+
+        function checkCustomOption(type) {
+            const select = document.getElementById(`video-length`);
+            let inputId;
+            let selectId;
+
+            if (type === 'length') { inputId = 'custom-length'; selectId = 'video-length'; }
+            else if (type === 'tier') { inputId = 'custom-tier'; selectId = 'service-tier'; }
+            else if (type === 'turnaround') { inputId = 'custom-turnaround'; selectId = 'turnaround'; }
+
+            const input = document.getElementById(inputId);
+            const selectElement = document.getElementById(selectId);
+
+            if (selectElement.value === '99') {
+                input.classList.remove('hidden');
+            } else {
+                input.classList.add('hidden');
+            }
+        }
+
+        // FEATURE 1: Interactive Price Quote Calculator (Updated)
+        const baseRate = 175;
+        const rates = {
+            length: { 1: 1, 2: 2, 4: 4, 99: 4.5 }, // 99 gets max multiplier + 0.5
+            tier: { 1: 1, 1.5: 1.5, 2: 2, 99: 2.5 },
+            turnaround: { 1: 1, 1.3: 1.3, 99: 1.5 }
+        };
+
+        function calculateQuote() {
+            const lengthElement = document.getElementById('video-length');
+            const tierElement = document.getElementById('service-tier');
+            const turnaroundElement = document.getElementById('turnaround');
+            const prompt = document.getElementById('custom-quote-prompt');
+            const result = document.getElementById('quote-result');
+
+            const lengthValue = parseFloat(lengthElement.value);
+            const tierValue = parseFloat(tierElement.value);
+            const turnaroundValue = parseFloat(turnaroundElement.value);
+
+            // Check if any 'Other' option is selected (value 99)
+            const isCustom = lengthValue === 99 || tierValue === 99 || turnaroundValue === 99;
+
+            if (isCustom) {
+                prompt.classList.remove('hidden');
+            } else {
+                prompt.classList.add('hidden');
+            }
+            
+            const lengthMultiplier = rates.length[lengthValue];
+            const tierMultiplier = rates.tier[tierValue];
+            const turnaroundMultiplier = rates.turnaround[turnaroundValue];
+            
+            let quote = baseRate * lengthMultiplier * tierMultiplier * turnaroundMultiplier;
+            
+            quote = Math.max(100, Math.round(quote / 5) * 5);
+            
+            result.textContent = '$' + quote.toLocaleString();
+        }
+
+        // --- EXISTING & FEATURE LOGIC ---
+
+        // 1. Mobile Menu Toggle (Existing)
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // 2. Portfolio Filtering Logic (Existing)
+        const filterButtons = document.querySelectorAll('.portfolio-filter');
+        const portfolioItems = document.querySelectorAll('.portfolio-item');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+                    btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-blue-600', 'hover:text-white');
+                });
+                this.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+                this.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-blue-600', 'hover:text-white');
+
+                portfolioItems.forEach(item => {
+                    const category = item.getAttribute('data-category');
+                    if (filter === 'all' || category === filter) {
+                        item.classList.remove('hidden');
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateY(10px)';
+                        setTimeout(() => {
+                            item.style.opacity = '1';
+                            item.style.transform = 'translateY(0)';
+                            item.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                        }, 50);
+                    } else {
+                        item.classList.add('hidden');
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateY(10px)';
+                    }
+                });
+            });
+        });
+
+        // 3. Contact Form Submission Handling (Simulated)
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('success-modal').classList.remove('hidden');
+            this.reset();
+        });
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+        }
+
+
+        // FEATURE 2: Dynamic Before-and-After Slider Logic (Existing)
+        const sliderContainer = document.getElementById('slider-1-container');
+        const afterImage = document.getElementById('after-image');
+        const divider = document.getElementById('slider-divider');
+        const handle = document.getElementById('slider-handle');
+        let isDragging = false;
+
+        if (sliderContainer) {
+            sliderContainer.addEventListener('mousedown', startDrag);
+            sliderContainer.addEventListener('touchstart', startDragTouch);
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            isDragging = true;
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function startDragTouch(e) {
+            isDragging = true;
+            document.addEventListener('touchmove', dragMoveTouch);
+            document.addEventListener('touchend', stopDrag);
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchmove', dragMoveTouch);
+            document.removeEventListener('touchend', stopDrag);
+        }
+
+        function dragMove(e) {
+            if (!isDragging) return;
+            moveSlider(e.clientX);
+        }
+
+        function dragMoveTouch(e) {
+            if (!isDragging || !e.touches || e.touches.length === 0) return;
+            moveSlider(e.touches[0].clientX);
+        }
+
+        function moveSlider(xPos) {
+            const rect = sliderContainer.getBoundingClientRect();
+            let newX = xPos - rect.left;
+            
+            newX = Math.max(0, Math.min(newX, rect.width));
+            
+            const percent = (newX / rect.width) * 100;
+
+            afterImage.style.width = percent + '%';
+            divider.style.left = percent + '%';
+            handle.style.left = percent + '%';
+        }
+
+        // FEATURE 4: Exit-Intent/Newsletter Modal Functions (Existing)
+        function showNewsletterModal() {
+            const modal = document.getElementById('newsletter-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('opacity-100');
+                modal.querySelector('div').classList.remove('scale-90');
+            }, 50); 
+        }
+
+        function closeNewsletterModal() {
+            const modal = document.getElementById('newsletter-modal');
+            modal.classList.remove('opacity-100');
+            modal.querySelector('div').classList.add('scale-90');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 500);
+        }
+
+        // FEATURE 5: Client Project Tracker Mock-up Toggle (Existing)
+        const clientBtns = document.querySelectorAll('#client-login-btn-desktop, #client-login-btn-mobile');
+        const trackerInfo = document.getElementById('project-tracker-info');
+
+        clientBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                trackerInfo.classList.toggle('hidden');
+                setTimeout(() => {
+                    trackerInfo.classList.toggle('active');
+                }, 10);
+            });
+        });
+
+
+        // TRICK 2: Scroll Progress Bar Logic (Existing)
+        function updateProgressBar() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (scrollTop / scrollHeight) * 100;
+            document.getElementById('progress-bar').style.width = scrolled + '%';
+        }
+
+        // Global setup on window load
+        window.onload = function() {
+            calculateQuote();
+            // FEATURE 4: Show Modal after 10 seconds
+            setTimeout(showNewsletterModal, 10000); 
+
+            // TRICK 2: Setup Scroll Listener
+            window.addEventListener('scroll', updateProgressBar);
+            updateProgressBar(); // Set initial position
+        };
+    </script>
+
+</body>
+</html>
