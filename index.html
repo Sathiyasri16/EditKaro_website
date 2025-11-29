@@ -675,7 +675,9 @@
                 const token = await grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: action });
                 
                 // Set the token into the hidden input field
-                document.getElementById(`${formId}-g-recaptcha-response`).value = token;
+                // FINAL CORRECTED LINE:
+                document.getElementById(`${formId.replace('-form', '')}-g-recaptcha-response`).value = token;
+                //document.getElementById(`${formId}-g-recaptcha-response`).value = token;
                 
                 submitButton.textContent = 'Submitting...';
                 messageElement.textContent = 'Sending message, please wait...';
